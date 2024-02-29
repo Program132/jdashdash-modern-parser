@@ -43,7 +43,7 @@ namespace JDD::Lexer::Math {
         Token r = tokenList[index+1];
         if ((l.type != INT && l.type != DOUBLE) || (r.type != INT && r.type != DOUBLE)) {
             std::cerr << "Error: The lexer is not over due to a Math problem in your code (type problem), line " << r.line << std::endl;
-            exit(1);
+            exit(0);
         }
         return {std::stoi(l.content), std::stoi(r.content)};
     }

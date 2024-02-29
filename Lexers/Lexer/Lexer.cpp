@@ -2,7 +2,7 @@
 
 namespace JDD::Lexer {
     std::ostream &operator<<(std::ostream &flux, const Token &token) {
-        flux << token.content << " | " << stringTokenType[token.type] << " | " << token.line;
+        flux << " [TOKEN OBJECT] >>> " << token.content << " | " << stringTokenType[token.type] << " | " << token.line;
         return flux;
     }
 
