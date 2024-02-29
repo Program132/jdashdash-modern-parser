@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <cctype>
 #include <utility>
-#include "Lexer/Lexer.h"
-#include "MathLexer/MathLexer.h"
+#include "Lexers/Lexer/Lexer.h"
+#include "Lexers/MathLexer/MathLexer.h"
+#include "Parser/Parser.h"
 
 bool endsWith(std::string_view str, std::string_view suffix) {
     if (str.length() >= suffix.length()) {
@@ -45,9 +46,7 @@ int main(int argc, char** argv) {
     auto lexerResult = JDD::Lexer::Lexer(code);
     JDD::Lexer::Math::Lexer(lexerResult);
 
-    for (auto const& t : lexerResult) {
-        std::cout << t << std::endl;
-    }
-
+    //for (auto const& t : lexerResult) {std::cout << t << std::endl;}
+    JDD::Parser::run(lexerResult);
     return 0;
 }
