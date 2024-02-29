@@ -16,7 +16,6 @@ namespace JDD::Lexer {
         POSSIBLE_STRING,
         STRING,
         OPERATOR,
-        MATH_OPERATOR,
         COMMENT,
         POSSIBLE_LONG_COMMENT,
         LONG_COMMENT
@@ -32,7 +31,6 @@ namespace JDD::Lexer {
             "POSSIBLE_STRING",
             "STRING",
             "OPERATOR",
-            "MATH_OPERATOR",
             "COMMENT",
             "POSSIBLE_LONG_COMMENT",
             "LONG_COMMENT"

@@ -182,8 +182,6 @@ namespace JDD::Lexer {
         for (auto& t : tokenList) {
             if ((t.content == "true" || t.content == "false") && t.type == IDENTIFIANT) {
                 t.type = BOOL;
-            } else if ((t.content == "+" || t.content == "-" || t.content == "*" || t.content == "/") && t.type == OPERATOR) {
-                t.type = MATH_OPERATOR;
             }
         }
 
