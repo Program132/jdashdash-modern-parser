@@ -1,4 +1,4 @@
 int a = 2 * 3;
-int b = 5 + 10;
-int c = 6 / 2:
-int d = 10 - 10;
+double b = 10.7;
+string c = "Hello World";
+boolean d = false;
