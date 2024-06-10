@@ -16,8 +16,6 @@ add_executable(jdashdash_modern_parser main.cpp
         Definitions/Variable/Variable.h
         Definitions/Types/Types.h
         Definitions/Value/Value.h
-        Lexers/VariableReplacementLexer/VariableRepLexer.cpp
-        Lexers/VariableReplacementLexer/VariableRepLexer.h
         Definitions/Value/Value.cpp
         Expecter/Expecter.cpp
         Expecter/Expecter.h)
