@@ -12,8 +12,12 @@ using namespace JDD::Definitions;
 using namespace JDD::Lexer;
 
 namespace JDD::Parser {
-    void run(std::vector<Token> tokensList);
+    void run(std::vector<Token>& tokensList);
     bool instructionsManagement(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current);
 
     void basicVariableDeclaration(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, JDD::Definitions::Types type);
+    void operationsVariableOrFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, Token& id);
+    void deleteVariableOrFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current);
+
+    void assert_eq(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current);
 }

@@ -2,3 +2,9 @@ int a = 2 * 3;
 double b = 10.7;
 string c = "Hello World";
 boolean d = false;
+a = 10;
+delete a;
+
+int x = 3;
+int y = 10;
+assert_eq x, y, "Error !";

@@ -32,4 +32,8 @@ namespace JDD::Definitions {
             this->Variables.erase(name);
         }
     }
+
+    void Data::updateVariableValueFromData(const std::string &name, const std::string &value) {
+        this->Variables[name].value.content = value;
+    }
 }

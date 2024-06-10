@@ -15,5 +15,6 @@ namespace JDD::Definitions {
         void addVariableToData(const Variable& var);
         void addVariableToData(const std::string& name, const Value& value, const Types& type, const bool& isFinal);
         void removeVariableFromName(const std::string& name);
+        void updateVariableValueFromData(const std::string& name, const std::string& value);
     };
 }
