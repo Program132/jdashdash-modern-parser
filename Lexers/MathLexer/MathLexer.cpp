@@ -2,8 +2,8 @@
 
 namespace JDD::Lexer::Math {
     std::pair<bool, int> haveMul(const std::vector<Token>& tokenList) {
-        for (int i = 0; i < tokenList.size(); ++i) {
-            if (tokenList[i].type == OPERATOR && tokenList[i].content == "*") {
+        for (int i = 0; i < tokenList.size()-1; ++i) {
+            if (tokenList[i].type == OPERATOR && tokenList[i].content == "*" && tokenList[i+1].content != "=") {
                 return {true, i};
             }
         }
@@ -11,8 +11,8 @@ namespace JDD::Lexer::Math {
     }
 
     std::pair<bool, int> haveDiv(const std::vector<Token>& tokenList) {
-        for (int i = 0; i < tokenList.size(); ++i) {
-            if (tokenList[i].type == OPERATOR && tokenList[i].content == "/") {
+        for (int i = 0; i < tokenList.size()-1; ++i) {
+            if (tokenList[i].type == OPERATOR && tokenList[i].content == "/" && tokenList[i+1].content != "=") {
                 return {true, i};
             }
         }
@@ -20,8 +20,8 @@ namespace JDD::Lexer::Math {
     }
 
     std::pair<bool, int> haveAdd(std::vector<Token>& tokenList) {
-        for (int i = 0; i < tokenList.size(); ++i) {
-            if (tokenList[i].type == OPERATOR && tokenList[i].content == "+") {
+        for (int i = 0; i < tokenList.size()-1; ++i) {
+            if (tokenList[i].type == OPERATOR && tokenList[i].content == "+" && tokenList[i+1].content != "=") {
                 return {true, i};
             }
         }
@@ -29,8 +29,8 @@ namespace JDD::Lexer::Math {
     }
 
     std::pair<bool, int> haveSub(std::vector<Token>& tokenList) {
-        for (int i = 0; i < tokenList.size(); ++i) {
-            if (tokenList[i].type == OPERATOR && tokenList[i].content == "-") {
+        for (int i = 0; i < tokenList.size()-1; ++i) {
+            if (tokenList[i].type == OPERATOR && tokenList[i].content == "-" && tokenList[i+1].content != "=") {
                 return {true, i};
             }
         }
