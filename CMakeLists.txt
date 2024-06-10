@@ -18,4 +18,10 @@ add_executable(jdashdash_modern_parser main.cpp
         Definitions/Value/Value.h
         Definitions/Value/Value.cpp
         Expecter/Expecter.cpp
-        Expecter/Expecter.h)
+        Expecter/Expecter.h
+        Definitions/Function/Function.cpp
+        Definitions/Function/Function.h
+        Definitions/Function/Arguments.cpp
+        Definitions/Function/Arguments.h
+        Definitions/Function/ReturnVariable.cpp
+        Definitions/Function/ReturnVariable.h)
