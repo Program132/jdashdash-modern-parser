@@ -5,6 +5,9 @@ boolean d = false;
 a = 10;
 delete a;
 
-int x = 3;
+int x = 10;
 int y = 10;
 assert_eq x, y, "Error !";
+
+final int a = 10;
+a += 10;

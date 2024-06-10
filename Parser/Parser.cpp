@@ -28,6 +28,9 @@ namespace JDD::Parser {
         } else if (instruction.has_value() && instruction->content == "boolean") {
             basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::BOOLEAN);
             return true;
+        } else if (instruction.has_value() && instruction->content == "final") {
+            basicVariableDeclaration(data, tokensList, current, JDD::Definitions::Types::FINAL_NotType);
+            return true;
         } else if (instruction.has_value() && instruction->content == "delete") {
             deleteVariableOrFunction(data, tokensList, current);
             return true;
@@ -104,6 +107,11 @@ namespace JDD::Parser {
 
         auto var = data.getVariableFromName(id.content);
         if (var.has_value()) {
+            if (var->isFinal) {
+                std::cerr << "[OPERATIONS: Variables] Operations are forbidden on final (const) variables, line " << current->line << std::endl;
+                exit(16);
+            }
+
             std::string operatorVar = "=";
 
             if (ExpectOperator(current, "+")) {
