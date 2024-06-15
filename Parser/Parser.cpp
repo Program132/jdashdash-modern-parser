@@ -37,9 +37,6 @@ namespace JDD::Parser {
         } else if (instruction.has_value() && instruction->content == "assert_eq") {
             assert_eq(data, tokensList, current);
             return true;
-        } else if (instruction.has_value()) {
-            operationsVariableOrFunction(data, tokensList, current, instruction.value());
-            return true;
         } else if (instruction.has_value() && instruction->content == "public") {
             functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncPublic);
             return true;
@@ -48,6 +45,9 @@ namespace JDD::Parser {
             return true;
         } else if (instruction.has_value() && instruction->content == "public") {
             functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncProtected);
+            return true;
+        } else if (instruction.has_value()) {
+            operationsVariableOrFunction(data, tokensList, current, instruction.value());
             return true;
         }
         return false;
@@ -291,9 +291,8 @@ namespace JDD::Parser {
         function.returnVariable.type = type;
         function.state = state;
 
-        if (!ExpectOperator(current, "(").has_value()) {
-            bool canStop = false;
-            while (!canStop) {
+        if (ExpectOperator(current, "(").has_value()) {
+            while (!ExpectOperator(current, ")").has_value()) {
                 auto t = ExpectIdentifiant(current);
                 if (!t.has_value()) {
                     std::cerr << "[FUNCTION DECLARATION] Give the type of you argument, line " << current->line << std::endl;
@@ -328,7 +327,7 @@ namespace JDD::Parser {
                 function.pushArgument(arg);
 
                 if (!ExpectOperator(current, ",").has_value() && ExpectOperator(current, ")").has_value()) {
-                    canStop = true;
+                    break;
                 } else if (ExpectOperator(current, ",").has_value() && ExpectOperator(current, ")").has_value()) {
                     std::cerr << "[FUNCTION DECLARATION] Waiting another argument, remove ',' if you don't want to add more arguments into your function, line " << current->line << std::endl;
                     exit(20);
@@ -343,11 +342,13 @@ namespace JDD::Parser {
             int closeRequired = 1; // Number required : }
             while (closeRequired > 0) {
                 function.content_tokens.push_back(*current);
-                ++current;
                 if (ExpectOperator(current, "}").has_value()) {
                     closeRequired -= 1;
                 } else if (ExpectOperator(current, "{").has_value()) {
                     closeRequired += 1;
+                }
+                if (tokensList.end() != current) {
+                    ++current;
                 }
             }
         } else {
