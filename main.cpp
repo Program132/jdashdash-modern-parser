@@ -3,8 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <utility>
-#include "Lexers/Lexer/Lexer.h"
-#include "Lexers/MathLexer/MathLexer.h"
+#include "Lexer/Lexer.h"
 #include "Parser/Parser.h"
 
 bool endsWith(std::string_view str, std::string_view suffix) {
@@ -44,8 +43,6 @@ int main(int argc, char** argv) {
     std::string code((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
 
     auto lexerResult = JDD::Lexer::Lexer(code);
-    JDD::Lexer::Math::Lexer(lexerResult);
-
     //for (auto const& t : lexerResult) {std::cout << t << std::endl;}
     JDD::Parser::run(lexerResult);
     return 0;

@@ -122,7 +122,6 @@ namespace JDD::Lexer {
                     }
                     break;
 
-
                 case '+':
                 case '-':
                 case '{':

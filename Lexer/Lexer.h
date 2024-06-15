@@ -9,7 +9,6 @@ namespace JDD::Lexer {
     enum Types {
         WHITESPACE,
         IDENTIFIANT,
-        POSSIBLE_NEGATIVE,
         INT,
         BOOL,
         POSSIBLE_DOUBLE,
@@ -25,7 +24,6 @@ namespace JDD::Lexer {
     inline constexpr const char *stringTokenType[] {
             "WHITESPACE",
             "IDENTIFIANT",
-            "POSSIBLE_NEGATIVE",
             "INT",
             "BOOL",
             "POSSIBLE_DOUBLE",

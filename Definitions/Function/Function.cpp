@@ -18,3 +18,7 @@ bool JDD::Definitions::Function::isArgument(const std::string& n) const {
 void JDD::Definitions::Function::pushArgument(const JDD::Definitions::Argument &a) {
     this->arguments[a.name] = a;
 }
+
+int JDD::Definitions::Function::sizeArgumentsNeeded() {
+    return this->arguments.size();
+}

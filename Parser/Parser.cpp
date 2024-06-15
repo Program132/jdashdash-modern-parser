@@ -40,6 +40,15 @@ namespace JDD::Parser {
         } else if (instruction.has_value()) {
             operationsVariableOrFunction(data, tokensList, current, instruction.value());
             return true;
+        } else if (instruction.has_value() && instruction->content == "public") {
+            functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncPublic);
+            return true;
+        } else if (instruction.has_value() && instruction->content == "private") {
+            functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncPrivate);
+            return true;
+        } else if (instruction.has_value() && instruction->content == "public") {
+            functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncProtected);
+            return true;
         }
         return false;
     }
@@ -74,15 +83,11 @@ namespace JDD::Parser {
             exit(4);
         }
 
-        auto value = ExpectValue(current);
-        if (!value.has_value()) {
-            std::cerr << "[VARIABLE DECLARATION] Need the value of your variable, line " << current->line << std::endl;
-            exit(5);
-        }
+        std::vector<Token> contentValueVariable;
 
-        if (!ExpectOperator(current, ";").has_value()) {
-            std::cerr << "[VARIABLE DECLARATION] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
-            exit(6);
+        while (!ExpectOperator(current, ";").has_value()) {
+            contentValueVariable.push_back(*current);
+            ++current;
         }
 
         if (data.isVariable(name->content)) {
@@ -93,10 +98,10 @@ namespace JDD::Parser {
         Variable var;
         var.name = name->content;
         var.type = type;
-        var.value = value.value();
         var.isFinal = isFinal;
-
+        var.value = ReturnFinalValueFromListToken(data, current, contentValueVariable, var.type);
         data.addVariableToData(var);
+        std::cout << var.value.content << std::endl;
     }
 
     void operationsVariableOrFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, Token& id) {
@@ -252,6 +257,102 @@ namespace JDD::Parser {
         if (!ExpectOperator(current, ";").has_value()) {
             std::cerr << "[ASSERT_EQ] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
             exit(6);
+        }
+    }
+
+    void functionDeclaration(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, JDD::Definitions::FunctionState state) {
+        Definitions::Types type;
+
+        auto type_str = ExpectIdentifiant(current);
+        if (type_str.has_value() && type_str->content == "void") {
+            type = Definitions::VOID;
+        } else if (type_str.has_value() && type_str->content == "int") {
+            type = Definitions::INT;
+        } else if (type_str.has_value() && type_str->content == "double") {
+            type = Definitions::DOUBLE;
+        } else if (type_str.has_value() && type_str->content == "string") {
+            type = Definitions::STRING;
+        } else if (type_str.has_value() && type_str->content == "boolean") {
+            type = Definitions::BOOLEAN;
+        } else {
+            std::cerr << "[FUNCTION DECLARATION] Need a type for your function" << std::endl;
+            exit(1);
+        }
+
+        std::string name;
+        auto name_str = ExpectIdentifiant(current);
+        if (!name_str.has_value()) {
+            std::cerr << "[FUNCTION DECLARATION] Need the name of your function, line " << current->line << std::endl;
+            exit(3);
+        }
+
+        Function function;
+        function.name = name;
+        function.returnVariable.type = type;
+        function.state = state;
+
+        if (!ExpectOperator(current, "(").has_value()) {
+            bool canStop = false;
+            while (!canStop) {
+                auto t = ExpectIdentifiant(current);
+                if (!t.has_value()) {
+                    std::cerr << "[FUNCTION DECLARATION] Give the type of you argument, line " << current->line << std::endl;
+                    exit(18);
+                }
+
+                auto n = ExpectIdentifiant(current);
+                if (!n.has_value()) {
+                    std::cerr << "[FUNCTION DECLARATION] Give the name of you argument, line " << current->line << std::endl;
+                    exit(19);
+                }
+
+                Definitions::Types type_arg;
+                std::string name_arg = n->content;
+
+                if (t.has_value() && t->content == "void") {
+                    type_arg = Definitions::VOID;
+                } else if (t.has_value() && t->content == "int") {
+                    type_arg = Definitions::INT;
+                } else if (t.has_value() && t->content == "double") {
+                    type_arg = Definitions::DOUBLE;
+                } else if (t.has_value() && t->content == "string") {
+                    type_arg = Definitions::STRING;
+                } else if (t.has_value() && t->content == "boolean") {
+                    type_arg = Definitions::BOOLEAN;
+                } else {
+                    std::cerr << "[FUNCTION DECLARATION] Need a type for your function" << std::endl;
+                    exit(1);
+                }
+
+                Argument arg(type_arg, name_arg);
+                function.pushArgument(arg);
+
+                if (!ExpectOperator(current, ",").has_value() && ExpectOperator(current, ")").has_value()) {
+                    canStop = true;
+                } else if (ExpectOperator(current, ",").has_value() && ExpectOperator(current, ")").has_value()) {
+                    std::cerr << "[FUNCTION DECLARATION] Waiting another argument, remove ',' if you don't want to add more arguments into your function, line " << current->line << std::endl;
+                    exit(20);
+                }
+            }
+        } else {
+            std::cerr << "[FUNCTION DECLARATION] To give arguments open with '(argType argName, ...)', if you don't want to define arguments just add '()', line " << current->line << std::endl;
+            exit(17);
+        }
+
+        if (ExpectOperator(current, "{")) {
+            int closeRequired = 1; // Number required : }
+            while (closeRequired > 0) {
+                function.content_tokens.push_back(*current);
+                ++current;
+                if (ExpectOperator(current, "}").has_value()) {
+                    closeRequired -= 1;
+                } else if (ExpectOperator(current, "{").has_value()) {
+                    closeRequired += 1;
+                }
+            }
+        } else {
+            std::cerr << "[FUNCTION DECLARATION] In a function you give a block of code, to do it open with '{}', line " << current->line << std::endl;
+            exit(21);
         }
     }
 }

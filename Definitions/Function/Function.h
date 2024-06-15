@@ -6,7 +6,7 @@
 #include <algorithm>
 #include "../Types/Types.h"
 #include "../Value/Value.h"
-#include "../../Lexers/Lexer/Lexer.h"
+#include "../../Lexer/Lexer.h"
 #include "Arguments.h"
 #include "ReturnVariable.h"
 
@@ -35,5 +35,6 @@ namespace JDD::Definitions {
         bool isCallable(const std::string& elem);
         [[nodiscard]] bool isArgument(const std::string& n) const;
         void pushArgument(const Argument& a);
+        int sizeArgumentsNeeded();
     };
 }

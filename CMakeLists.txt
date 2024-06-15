@@ -4,10 +4,8 @@ project(jdashdash_modern_parser)
 set(CMAKE_CXX_STANDARD 23)
 
 add_executable(jdashdash_modern_parser main.cpp
-        Lexers/Lexer/Lexer.cpp
-        Lexers/Lexer/Lexer.h
-        Lexers/MathLexer/MathLexer.cpp
-        Lexers/MathLexer/MathLexer.h
+        Lexer/Lexer.cpp
+        Lexer/Lexer.h
         Parser/Parser.cpp
         Parser/Parser.h
         Definitions/Data/Data.cpp
