@@ -1,3 +1,6 @@
 private void myFunc() {
-
+    println("abc, test : ", 3, " ", 10, " ", 50+3);
+    println("It's my result : ", 5 + 3);
 }
+
+myFunc;

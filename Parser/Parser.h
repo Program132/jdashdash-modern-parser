@@ -18,8 +18,9 @@ namespace JDD::Parser {
     void run(std::vector<Token>& tokensList);
     bool instructionsManagement(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current);
 
+    void print(Data &data, std::vector<JDD::Lexer::Token> &tokensList, std::vector<Token>::iterator &current, bool jumpLine);
     void basicVariableDeclaration(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, JDD::Definitions::Types type);
-    void operationsVariableOrFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, Token& id);
+    void managementVariablesFunctionsCallModification(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, Token& id);
     void deleteVariableOrFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current);
     void assert_eq(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current);
 

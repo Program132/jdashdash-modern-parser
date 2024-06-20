@@ -36,4 +36,24 @@ namespace JDD::Definitions {
     void Data::updateVariableValueFromData(const std::string &name, const std::string &value) {
         this->Variables[name].value.content = value;
     }
+
+    bool Data::isFunction(const std::string &name) const {
+        if (Functions.contains(name)) {
+            return true;
+        }
+        return false;
+    }
+
+    void Data::addFunctionToData(const Function& func) {
+        if (!isFunction(func.name)) {
+            this->Functions[func.name] = func;
+        }
+    }
+
+    std::optional<Function> Data::getFunctionFromName(const std::string &name) {
+        if (this->isFunction(name)) {
+            return this->Functions[name];
+        }
+        return std::nullopt;
+    }
 }

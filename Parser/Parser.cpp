@@ -1,6 +1,35 @@
 #include "Parser.h"
 
 namespace JDD::Parser {
+    bool containsComma(const std::vector<JDD::Lexer::Token>& vec) {
+        return std::ranges::any_of(vec, [](const JDD::Lexer::Token& token) {
+            return token.content == ",";
+        });
+    }
+
+    std::vector<std::vector<JDD::Lexer::Token>> splitByComma(const std::vector<JDD::Lexer::Token>& vec) {
+        std::vector<std::vector<JDD::Lexer::Token>> result;
+        std::vector<JDD::Lexer::Token> currentSegment;
+
+        for (const auto& token : vec) {
+            if (token.content == ",") {
+                if (!currentSegment.empty()) {
+                    result.push_back(currentSegment);
+                    currentSegment.clear();
+                }
+            } else {
+                currentSegment.push_back(token);
+            }
+        }
+        if (!currentSegment.empty()) {
+            result.push_back(currentSegment);
+        }
+
+        return result;
+    }
+
+
+
     void run(std::vector<JDD::Lexer::Token>& tokensList)  {
         Data data;
         auto current = tokensList.begin();
@@ -12,6 +41,18 @@ namespace JDD::Parser {
             }
         }
     }
+
+    void runCodeBlock(std::vector<JDD::Lexer::Token>& tokenBlock, Data& globalData) {
+        auto current = tokenBlock.begin();
+        while (current != tokenBlock.end()) {
+            if (!instructionsManagement(globalData, tokenBlock, current)) {
+                std::cerr  << "{UNKNOWN} -> " << *current << std::endl;
+                ++current;
+            }
+        }
+    }
+
+    void print(Data &data, std::vector<JDD::Lexer::Token> &vector, std::vector<Token>::iterator &iterator);
 
     bool instructionsManagement(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current) {
         auto instruction = ExpectIdentifiant(current);
@@ -43,17 +84,63 @@ namespace JDD::Parser {
         } else if (instruction.has_value() && instruction->content == "private") {
             functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncPrivate);
             return true;
-        } else if (instruction.has_value() && instruction->content == "public") {
+        } else if (instruction.has_value() && instruction->content == "protected") {
             functionDeclaration(data, tokensList, current, JDD::Definitions::FunctionState::FuncProtected);
             return true;
+        } else if (instruction.has_value() && instruction->content == "print") {
+            print(data, tokensList, current, false);
+            return true;
+        } else if (instruction.has_value() && instruction->content == "println") {
+            print(data, tokensList, current, true);
+            return true;
         } else if (instruction.has_value()) {
-            operationsVariableOrFunction(data, tokensList, current, instruction.value());
+            managementVariablesFunctionsCallModification(data, tokensList, current, instruction.value());
             return true;
         }
         return false;
     }
 
+    void print(Data &data, std::vector<JDD::Lexer::Token> &tokensList, std::vector<Token>::iterator &current, bool jumpLine) {
+        if (!ExpectOperator(current, "(").has_value()) {
+            std::cerr << "[PRINT] To give input open '()', line " << current->line << std::endl;
+            exit(22);
+        }
 
+
+
+        std::vector<Token> contentPrint;
+
+        while (!ExpectOperator(current, ")").has_value()) {
+            contentPrint.push_back(*current);
+            ++current;
+        }
+
+        std::string finalResultPrint;
+
+        if (containsComma(contentPrint)) {
+            auto valuesInPrint = splitByComma(contentPrint);
+            for (auto e : valuesInPrint) {
+                JDD::Definitions::Types awaitingType = JDD::Definitions::VOID;
+                auto v = ReturnFinalValueFromListToken(data, current, e, awaitingType);
+                finalResultPrint += v.content;
+            }
+        } else {
+            JDD::Definitions::Types awaitingType = JDD::Definitions::VOID;
+            auto v = ReturnFinalValueFromListToken(data, current, contentPrint, awaitingType);
+            finalResultPrint += v.content;
+        }
+
+        if (!ExpectOperator(current, ";").has_value()) {
+            std::cerr << "[PRINT] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
+            exit(6);
+        }
+
+        if (jumpLine) {
+            std::cout << "\n" << finalResultPrint;
+        } else {
+            std::cout << finalResultPrint;
+        }
+    }
 
     void basicVariableDeclaration(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, JDD::Definitions::Types type) {
         std::optional<Definitions::Types> var_type = type;
@@ -101,11 +188,10 @@ namespace JDD::Parser {
         var.isFinal = isFinal;
         var.value = ReturnFinalValueFromListToken(data, current, contentValueVariable, var.type);
         data.addVariableToData(var);
-        std::cout << var.value.content << std::endl;
     }
 
-    void operationsVariableOrFunction(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, Token& id) {
-        if (!data.getVariableFromName(id.content).has_value()) {
+    void managementVariablesFunctionsCallModification(Data& data, std::vector<JDD::Lexer::Token>& tokensList, std::vector<Token>::iterator& current, Token& id) {
+        if (!data.isVariable(id.content) && !data.isFunction(id.content)) {
             std::cerr << "[OPERATIONS: Variables - Functions] The variable/function does not exist, line " << current->line << std::endl;
             exit(8);
         }
@@ -179,11 +265,14 @@ namespace JDD::Parser {
                 double right = std::stod(value->content);
                 data.updateVariableValueFromData(id.content, std::to_string(left - right));
             }
+        } else if (data.isFunction(id.content)) {
+            auto func = data.getFunctionFromName(id.content);
+            runCodeBlock(func->content_tokens, data);
+        }
 
-            if (!ExpectOperator(current, ";")) {
-                std::cerr << "[OPERATIONS: Variables] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
-                exit(6);
-            }
+        if (!ExpectOperator(current, ";")) {
+            std::cerr << "[OPERATIONS: Variables] Need ';' operator to conclude the instruction, line " << current->line << std::endl;
+            exit(6);
         }
     }
 
@@ -279,7 +368,6 @@ namespace JDD::Parser {
             exit(1);
         }
 
-        std::string name;
         auto name_str = ExpectIdentifiant(current);
         if (!name_str.has_value()) {
             std::cerr << "[FUNCTION DECLARATION] Need the name of your function, line " << current->line << std::endl;
@@ -287,7 +375,7 @@ namespace JDD::Parser {
         }
 
         Function function;
-        function.name = name;
+        function.name = name_str->content;
         function.returnVariable.type = type;
         function.state = state;
 
@@ -341,13 +429,13 @@ namespace JDD::Parser {
         if (ExpectOperator(current, "{")) {
             int closeRequired = 1; // Number required : }
             while (closeRequired > 0) {
-                function.content_tokens.push_back(*current);
                 if (ExpectOperator(current, "}").has_value()) {
                     closeRequired -= 1;
                 } else if (ExpectOperator(current, "{").has_value()) {
                     closeRequired += 1;
                 }
-                if (tokensList.end() != current) {
+                if (closeRequired > 0 && tokensList.end() != current) {
+                    function.content_tokens.push_back(*current);
                     ++current;
                 }
             }
@@ -355,5 +443,7 @@ namespace JDD::Parser {
             std::cerr << "[FUNCTION DECLARATION] In a function you give a block of code, to do it open with '{}', line " << current->line << std::endl;
             exit(21);
         }
+
+        data.addFunctionToData(function);
     }
 }

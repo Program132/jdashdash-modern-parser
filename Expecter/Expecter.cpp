@@ -154,7 +154,7 @@ namespace JDD::Parser {
                 exit(22);
             }
         }
-        else if (list.size() > 1 && awaitingType == Definitions::INT) {
+        else if (list.size() > 1 && (awaitingType == Definitions::INT || awaitingType == Definitions::VOID)) {
             auto possibleMul = haveChar(list, "*");
             while (possibleMul.first) {
                 auto elements = getElementsFromIndexChar(list, possibleMul.second);
@@ -269,7 +269,7 @@ namespace JDD::Parser {
             value.type = Definitions::INT;
             value.content = list[list.size()-1].content;
         }
-        else if (list.size() > 1 && awaitingType == Definitions::DOUBLE) {
+        else if (list.size() > 1 && (awaitingType == Definitions::DOUBLE || awaitingType == Definitions::VOID)) {
             auto possibleMul = haveChar(list, "*");
             while (possibleMul.first) {
                 auto elements = getElementsFromIndexChar(list, possibleMul.second);
